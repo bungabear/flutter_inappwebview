@@ -139,6 +139,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public Runnable checkContextMenuShouldBeClosedTask;
   public int newCheckContextMenuShouldBeClosedTaskTask = 100; // ms
   public boolean keepRunOnVisibleGone = false;
+  public int realVisibility = View.GONE;
   public UserContentController userContentController = new UserContentController();
 
   public Map<String, ValueCallback<String>> callAsyncJavaScriptCallbacks = new HashMap<>();
@@ -1709,6 +1710,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Override
   public void setKeepRunOnVisibleGone(Boolean keepRunOnVisibleGone) {
     this.keepRunOnVisibleGone = keepRunOnVisibleGone;
+    if(keepRunOnVisibleGone){
+      if (realVisibility == View.GONE) {
+        super.onWindowVisibilityChanged(View.VISIBLE);
+      }
+    }
+    else {
+      if (realVisibility == View.GONE) {
+        super.onWindowVisibilityChanged(realVisibility);
+      }
+    }
   }
 
   @Override
@@ -1723,6 +1734,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   protected void onWindowVisibilityChanged(int visibility) {
+    this.realVisibility = visibility;
     if(this.keepRunOnVisibleGone){
       if (visibility == View.GONE) {
         super.onWindowVisibilityChanged(View.VISIBLE);
