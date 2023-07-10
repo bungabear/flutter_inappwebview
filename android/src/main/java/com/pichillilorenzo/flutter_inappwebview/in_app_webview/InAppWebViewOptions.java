@@ -25,6 +25,7 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
   public Boolean useShouldOverrideUrlLoading = false;
   public Boolean useOnLoadResource = false;
   public Boolean useOnDownloadStart = false;
+  public Boolean keepRunOnVisibleGone = false;
   public Boolean clearCache = false;
   public String userAgent = "";
   public String applicationNameForUserAgent = "";
@@ -128,6 +129,9 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
           break;
         case "useOnDownloadStart":
           useOnDownloadStart = (Boolean) value;
+          break;
+        case "keepRunOnVisibleGone":
+          keepRunOnVisibleGone = (Boolean) value;
           break;
         case "clearCache":
           clearCache = (Boolean) value;
@@ -375,6 +379,7 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
     options.put("useShouldOverrideUrlLoading", useShouldOverrideUrlLoading);
     options.put("useOnLoadResource", useOnLoadResource);
     options.put("useOnDownloadStart", useOnDownloadStart);
+    options.put("keepRunOnVisibleGone", keepRunOnVisibleGone);
     options.put("clearCache", clearCache);
     options.put("userAgent", userAgent);
     options.put("applicationNameForUserAgent", applicationNameForUserAgent);

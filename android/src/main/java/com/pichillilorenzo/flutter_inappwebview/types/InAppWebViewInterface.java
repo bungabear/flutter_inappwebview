@@ -100,4 +100,6 @@ public interface InAppWebViewInterface {
   void disposeWebMessageChannels();
   void disposeWebMessageListeners();
   Looper getWebViewLooper();
+  void setKeepRunOnVisibleGone(Boolean keepRunOnVisibleGone);
+  boolean getKeepRunOnVisibleGone();
 }

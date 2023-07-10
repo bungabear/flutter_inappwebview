@@ -18,7 +18,7 @@ class InAppWebViewExampleScreen extends StatefulWidget {
 
 class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   final GlobalKey webViewKey = GlobalKey();
-
+  bool keepRunOnVisibleGone = false;
   InAppWebViewController? webViewController;
   InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
       crossPlatform: InAppWebViewOptions(
@@ -26,6 +26,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
           mediaPlaybackRequiresUserGesture: false),
       android: AndroidInAppWebViewOptions(
         useHybridComposition: true,
+        keepRunOnVisibleGone: false,
       ),
       ios: IOSInAppWebViewOptions(
         allowsInlineMediaPlayback: true,

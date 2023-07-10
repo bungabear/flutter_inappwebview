@@ -17,6 +17,9 @@ class AndroidInAppWebViewOptions
   ///Sets the text zoom of the page in percent. The default value is `100`.
   int textZoom;
 
+  ///Set to `true` to keep working webview in visible gone or app is background
+  bool keepRunOnVisibleGone;
+
   ///Set to `true` to have the session cookie cache cleared before the new window is opened.
   bool clearSessionCache;
 
@@ -296,6 +299,7 @@ class AndroidInAppWebViewOptions
     this.verticalScrollbarTrackColor,
     this.horizontalScrollbarThumbColor,
     this.horizontalScrollbarTrackColor,
+    this.keepRunOnVisibleGone = false,
   });
 
   @override
@@ -356,6 +360,7 @@ class AndroidInAppWebViewOptions
       "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
       "horizontalScrollbarThumbColor": horizontalScrollbarThumbColor?.toHex(),
       "horizontalScrollbarTrackColor": horizontalScrollbarTrackColor?.toHex(),
+      "keepRunOnVisibleGone": keepRunOnVisibleGone,
     };
   }
 
@@ -403,7 +408,7 @@ class AndroidInAppWebViewOptions
     options.hardwareAcceleration = map["hardwareAcceleration"];
     options.supportMultipleWindows = map["supportMultipleWindows"];
     options.regexToCancelSubFramesLoading =
-        map["regexToCancelSubFramesLoading"];
+    map["regexToCancelSubFramesLoading"];
     options.useHybridComposition = map["useHybridComposition"];
     options.useShouldInterceptRequest = map["useShouldInterceptRequest"];
     options.useOnRenderProcessGone = map["useOnRenderProcessGone"];
@@ -416,7 +421,7 @@ class AndroidInAppWebViewOptions
         AndroidVerticalScrollbarPosition.fromValue(
             map["verticalScrollbarPosition"]);
     options.scrollBarDefaultDelayBeforeFade =
-        map["scrollBarDefaultDelayBeforeFade"];
+    map["scrollBarDefaultDelayBeforeFade"];
     options.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
     options.scrollBarFadeDuration = map["scrollBarFadeDuration"];
     options.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
@@ -430,6 +435,7 @@ class AndroidInAppWebViewOptions
         UtilColor.fromHex(map["horizontalScrollbarThumbColor"]);
     options.horizontalScrollbarTrackColor =
         UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
+    options.keepRunOnVisibleGone = map["keepRunOnVisibleGone"];
     return options;
   }
 

@@ -81,7 +81,7 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
           webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
         }
         result.success(true);
-      break;
+        break;
       case "loadFile":
         if (webView != null) {
           String assetFilePath = (String) call.argument("assetFilePath");
@@ -143,6 +143,16 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
         if (webView != null)
           webView.goBack();
         result.success(true);
+        break;
+      case "setKeepRunOnVisibleGone":
+        if (webView != null){
+          Boolean keepRunOnVisibleGone = (Boolean) call.argument("keepRunOnVisibleGone");
+          webView.setKeepRunOnVisibleGone(keepRunOnVisibleGone);
+        }
+        result.success(true);
+        break;
+      case "getKeepRunOnVisibleGone":
+        result.success((webView != null) && webView.getKeepRunOnVisibleGone());
         break;
       case "canGoBack":
         result.success((webView != null) && webView.canGoBack());

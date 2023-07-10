@@ -138,7 +138,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   public Runnable checkContextMenuShouldBeClosedTask;
   public int newCheckContextMenuShouldBeClosedTaskTask = 100; // ms
-
+  public boolean keepRunOnVisibleGone = false;
   public UserContentController userContentController = new UserContentController();
 
   public Map<String, ValueCallback<String>> callAsyncJavaScriptCallbacks = new HashMap<>();
@@ -552,7 +552,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (plugin == null) {
       return;
     }
-    
+
     loadUrl(Util.getUrlAsset(plugin, assetFilePath));
   }
 
@@ -582,7 +582,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   public void takeScreenshot(final @Nullable Map<String, Object> screenshotConfiguration, final MethodChannel.Result result) {
     final float pixelDensity = Util.getPixelDensity(getContext());
-    
+
     mainLooperHandler.post(new Runnable() {
       @Override
       public void run() {
@@ -952,6 +952,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         setHorizontalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(newOptions.horizontalScrollbarTrackColor)));
     }
 
+    if (newOptionsMap.get("keepRunOnVisibleGone") != null) {
+      keepRunOnVisibleGone = newOptions.keepRunOnVisibleGone;
+    }
+
     options = newOptions;
   }
 
@@ -993,7 +997,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (resultUuid != null && resultCallback != null) {
       evaluateJavaScriptContentWorldCallbacks.put(resultUuid, resultCallback);
       scriptToInject = Util.replaceAll(PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE,
-              PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_" + Math.round(Math.random() * 1000000))
+                      PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_" + Math.round(Math.random() * 1000000))
               .replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, UserContentController.escapeCode(source))
               .replace(PluginScriptsUtil.VAR_RESULT_UUID, resultUuid);
     }
@@ -1038,15 +1042,15 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         String scriptIdEscaped = idAttr.replaceAll("'", "\\\\'");
         scriptAttributes += " script.id = '" + scriptIdEscaped + "'; ";
         scriptAttributes += " script.onload = function() {" +
-        "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
-        "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
-        "  }" +
-        "};";
+                "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+                "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
+                "  }" +
+                "};";
         scriptAttributes += " script.onerror = function() {" +
-        "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
-        "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
-        "  }" +
-        "};";
+                "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+                "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
+                "  }" +
+                "};";
       }
       Boolean asyncAttr = (Boolean) scriptHtmlTagAttributes.get("async");
       if (asyncAttr != null && asyncAttr) {
@@ -1200,13 +1204,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     @Override
     public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
       DownloadStartRequest downloadStartRequest = new DownloadStartRequest(
-        url,
-        userAgent,
-        contentDisposition,
-        mimeType,
-        contentLength,
-        URLUtil.guessFileName(url, contentDisposition, mimeType),
-        null
+              url,
+              userAgent,
+              contentDisposition,
+              mimeType,
+              contentLength,
+              URLUtil.guessFileName(url, contentDisposition, mimeType),
+              null
       );
       channel.invokeMethod("onDownloadStartRequest", downloadStartRequest.toMap());
     }
@@ -1703,14 +1707,30 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
   @Override
+  public void setKeepRunOnVisibleGone(Boolean keepRunOnVisibleGone) {
+    this.keepRunOnVisibleGone = keepRunOnVisibleGone;
+  }
+
+  @Override
+  public boolean getKeepRunOnVisibleGone() {
+    return this.keepRunOnVisibleGone;
+  }
+
+  @Override
   public void postWebMessage(com.pichillilorenzo.flutter_inappwebview.types.WebMessage message, Uri targetOrigin, ValueCallback<String> callback) throws Exception {
     throw new UnsupportedOperationException();
   }
 
-  //  @Override
-//  protected void onWindowVisibilityChanged(int visibility) {
-//    if (visibility != View.GONE) super.onWindowVisibilityChanged(View.VISIBLE);
-//  }
+  @Override
+  protected void onWindowVisibilityChanged(int visibility) {
+    if(this.keepRunOnVisibleGone){
+      if (visibility == View.GONE) {
+        super.onWindowVisibilityChanged(View.VISIBLE);
+        return;
+      }
+    }
+    super.onWindowVisibilityChanged(visibility);
+  }
 
   public float getZoomScale() {
     return zoomScale;
